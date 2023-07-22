@@ -227,10 +227,10 @@ func main() {
 	store := NewStore()
 	router := http.NewServeMux()
 	server := http.Server{
-		Addr: "localhost:"+os.Getenv("SERVERPORT"),
-		Handler: router,
-		ReadTimeout: 10 * time.Second,
-		WriteTimeout: 120 * time.Second,
+		Addr:           "localhost:" + os.Getenv("SERVERPORT"),
+		Handler:        router,
+		ReadTimeout:    10 * time.Second,
+		WriteTimeout:   120 * time.Second,
 		MaxHeaderBytes: 1 << 20,
 	}
 	router.HandleFunc("/task/", store.task)
