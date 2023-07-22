@@ -98,49 +98,27 @@ func (s *Store) createTaskHandler(w http.ResponseWriter, req *http.Request) {
 	}
 
 	id := s.store.CreateTask(rt.Text, rt.Tags, rt.Due)
-	js, err := json.Marshal(ResponseId{Id: id})
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(js)
+	renderJSON(w, id)
 }
 
 func (s *Store) getAllTasksHandler(w http.ResponseWriter, req *http.Request) {
 	log.Printf("handling get all tasks at %s\n", req.URL.Path)
-
 	allTasks := s.store.GetAllTasks()
-	js, err := json.Marshal(allTasks)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(js)
+	renderJSON(w, allTasks)
 }
 
 func (s *Store) getTaskHandler(w http.ResponseWriter, req *http.Request, id int) {
 	log.Printf("handling get task at %s\n", req.URL.Path)
-
 	task, err := s.store.GetTask(id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
-
-	js, err := json.Marshal(task)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(js)
+	renderJSON(w, task)
 }
 
 func (s *Store) deleteTaskHandler(w http.ResponseWriter, req *http.Request, id int) {
 	log.Printf("handling delete task at %s\n", req.URL.Path)
-
 	err := s.store.DeleteTask(id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusNotFound)
@@ -169,13 +147,7 @@ func (s *Store) tag(w http.ResponseWriter, req *http.Request) {
 	tag := pathParts[1]
 
 	tasks := s.store.GetTasksByTag(tag)
-	js, err := json.Marshal(tasks)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(js)
+	renderJSON(w, tasks)
 }
 
 func (s *Store) due(w http.ResponseWriter, req *http.Request) {
@@ -214,14 +186,20 @@ func (s *Store) due(w http.ResponseWriter, req *http.Request) {
 	}
 
 	tasks := s.store.GetTasksByDueDate(year, time.Month(month), day)
-	js, err := json.Marshal(tasks)
+	renderJSON(w, tasks)
+}
+
+
+// renderJSON renders 'v' as JSON and writes it as a response into w.
+func renderJSON(w http.ResponseWriter, v interface{}) {
+	js, err := json.Marshal(v)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+	  http.Error(w, err.Error(), http.StatusInternalServerError)
+	  return
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(js)
-}
+  }
 
 func main() {
 	store := NewStore()
