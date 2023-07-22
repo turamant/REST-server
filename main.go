@@ -109,6 +109,7 @@ func (s *Store) getAllTasksHandler(w http.ResponseWriter, req *http.Request) {
 
 func (s *Store) getTaskHandler(w http.ResponseWriter, req *http.Request, id int) {
 	log.Printf("handling get task at %s\n", req.URL.Path)
+	
 	task, err := s.store.GetTask(id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusNotFound)
