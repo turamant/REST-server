@@ -49,10 +49,6 @@ func (s *Store) createTaskHandler(w http.ResponseWriter, req *http.Request) {
 		Due  time.Time `json:"due"`
 	}
 
-	type ResponseId struct {
-		Id int `json:"id"`
-	}
-
 	// Enforce a JSON Content-Type.
 	contentType := req.Header.Get("Content-Type")
 	mediatype, _, err := mime.ParseMediaType(contentType)
@@ -143,7 +139,7 @@ func main() {
 	store := NewStore()
 	router := mux.NewRouter()
 	router.StrictSlash(true)
-	lm := &middleware.LoggingMiddleware{Handler: router}
+	lm := middleware.LoggingMiddleware(router)
 	server := http.Server{
 		Addr:           "localhost:" + os.Getenv("SERVERPORT"),
 		Handler:        lm,
