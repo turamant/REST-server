@@ -12,7 +12,19 @@ import (
 	"time"
 
 	"github.com/turamant/restserver/internal/taskstore"
+	"github.com/turamant/restserver/middleware"
+
 )
+
+// type LoggingMiddleware struct {
+// 	handler http.Handler
+//   }
+  
+//   func (lm *LoggingMiddleware) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+// 	start := time.Now()
+// 	lm.handler.ServeHTTP(w, req)
+// 	log.Printf("%s %s %s", req.Method, req.RequestURI, time.Since(start))
+//   }
 
 type Store struct {
 	store *taskstore.TaskStore
@@ -205,9 +217,10 @@ func renderJSON(w http.ResponseWriter, v interface{}) {
 func main() {
 	store := NewStore()
 	router := http.NewServeMux()
+	lm := &middleware.LoggingMiddleware{Handler: router}
 	server := http.Server{
 		Addr:           "localhost:" + os.Getenv("SERVERPORT"),
-		Handler:        router,
+		Handler:        lm,
 		ReadTimeout:    10 * time.Second,
 		WriteTimeout:   120 * time.Second,
 		MaxHeaderBytes: 1 << 20,
